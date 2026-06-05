@@ -494,6 +494,7 @@
     <script>
     (function() {
         var API_URL = 'https://api.github.com/repos/moxiaoyuuu/my-website/issues/1/comments';
+        var POST_URL = 'https://my-website-henna-gamma.vercel.app/api/comment';
 
         var form = document.getElementById('commentForm');
         var list = document.getElementById('commentList');
@@ -566,16 +567,14 @@
                 pad(now.getDate()) + ' ' +
                 pad(now.getHours()) + ':' +
                 pad(now.getMinutes());
-            var body = JSON.stringify({ name: name, message: msg, time: timeStr });
+            var body = JSON.stringify({ name: name, message: msg });
 
-            fetch(API_URL, {
+            fetch(POST_URL, {
                 method: 'POST',
                 headers: {
-                    'Accept': 'application/vnd.github+json',
                     'Content-Type': 'application/json',
-                    'Authorization': 'token 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'
                 },
-                body: JSON.stringify({ body: body })
+                body: body
             })
             .then(function(r) {
                 if (!r.ok) throw new Error('Failed');

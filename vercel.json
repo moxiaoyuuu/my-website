@@ -1,0 +1,8 @@
+{
+  "functions": {
+    "api/comment.js": {
+      "memory": 128,
+      "maxDuration": 10
+    }
+  }
+}
