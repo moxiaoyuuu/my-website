@@ -490,33 +490,56 @@
         <p>© 2026 李玥琦 | 用 ❤️ 和 Claude Code 搭的第一个网页</p>
     </footer>
 
-    <!-- 原生留言板 -->
+    <!-- 原生留言板（基于 GitHub Issues） -->
     <script>
     (function() {
-        var BLOB_ID = '019e9851-3b24-7055-86cc-351d64b011c0';
-        var API_URL = 'https://jsonblob.com/api/jsonBlob/' + BLOB_ID;
+        var API_URL = 'https://api.github.com/repos/moxiaoyuuu/my-website/issues/1/comments';
 
         var form = document.getElementById('commentForm');
         var list = document.getElementById('commentList');
         var submitBtn = document.getElementById('submitBtn');
 
+        // 从 GitHub comment body 解析出昵称、时间、内容
+        // body 格式: {"name":"xxx","message":"xxx","time":"xxx"}
+        function parseComment(body) {
+            try {
+                return JSON.parse(body);
+            } catch(e) {
+                return { name: '匿名', message: body, time: '' };
+            }
+        }
+
+        // 格式化时间
+        function formatTime(dateStr) {
+            var d = new Date(dateStr);
+            if (isNaN(d.getTime())) return dateStr;
+            return d.getFullYear() + '-' +
+                pad(d.getMonth() + 1) + '-' +
+                pad(d.getDate()) + ' ' +
+                pad(d.getHours()) + ':' +
+                pad(d.getMinutes());
+        }
+
         // 加载留言
         function loadComments() {
-            fetch(API_URL)
+            fetch(API_URL, { headers: { 'Accept': 'application/vnd.github+json' } })
                 .then(function(r) { return r.json(); })
-                .then(function(data) {
-                    var comments = data.comments || [];
+                .then(function(comments) {
+                    if (!Array.isArray(comments)) {
+                        throw new Error('Invalid response');
+                    }
                     if (comments.length === 0) {
                         list.innerHTML = '<p class="comment-empty">✨ 还没有留言，来做第一个留言的人吧！</p>';
                     } else {
                         var html = '';
-                        comments.slice().reverse().forEach(function(c) {
+                        comments.forEach(function(c) {
+                            var p = parseComment(c.body);
                             html += '<div class="comment-card">' +
                                 '<div class="comment-header">' +
-                                    '<span class="comment-name">' + escapeHtml(c.name) + '</span>' +
-                                    '<span class="comment-time">' + escapeHtml(c.time || '') + '</span>' +
+                                    '<span class="comment-name">' + escapeHtml(p.name) + '</span>' +
+                                    '<span class="comment-time">' + escapeHtml(formatTime(c.created_at)) + '</span>' +
                                 '</div>' +
-                                '<div class="comment-text">' + escapeHtml(c.message) + '</div>' +
+                                '<div class="comment-text">' + escapeHtml(p.message) + '</div>' +
                             '</div>';
                         });
                         list.innerHTML = html;
@@ -537,37 +560,39 @@
             submitBtn.disabled = true;
             submitBtn.textContent = '发送中...';
 
-            // 先获取当前列表
-            fetch(API_URL)
-                .then(function(r) { return r.json(); })
-                .then(function(data) {
-                    var comments = data.comments || [];
-                    var now = new Date();
-                    var timeStr = now.getFullYear() + '-' +
-                        pad(now.getMonth() + 1) + '-' +
-                        pad(now.getDate()) + ' ' +
-                        pad(now.getHours()) + ':' +
-                        pad(now.getMinutes());
-                    comments.push({ name: name, message: msg, time: timeStr });
+            var now = new Date();
+            var timeStr = now.getFullYear() + '-' +
+                pad(now.getMonth() + 1) + '-' +
+                pad(now.getDate()) + ' ' +
+                pad(now.getHours()) + ':' +
+                pad(now.getMinutes());
+            var body = JSON.stringify({ name: name, message: msg, time: timeStr });
 
-                    return fetch(API_URL, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ comments: comments })
-                    });
-                })
-                .then(function() {
-                    document.getElementById('commentName').value = '';
-                    document.getElementById('commentMsg').value = '';
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = '💬 发布留言';
-                    loadComments();
-                })
-                .catch(function() {
-                    alert('留言失败，请重试');
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = '💬 发布留言';
-                });
+            fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/vnd.github+json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'token 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'
+                },
+                body: JSON.stringify({ body: body })
+            })
+            .then(function(r) {
+                if (!r.ok) throw new Error('Failed');
+                return r.json();
+            })
+            .then(function() {
+                document.getElementById('commentName').value = '';
+                document.getElementById('commentMsg').value = '';
+                submitBtn.disabled = false;
+                submitBtn.textContent = '💬 发布留言';
+                loadComments();
+            })
+            .catch(function() {
+                alert('留言失败，请重试');
+                submitBtn.disabled = false;
+                submitBtn.textContent = '💬 发布留言';
+            });
         });
 
         function pad(n) { return n < 10 ? '0' + n : n; }
