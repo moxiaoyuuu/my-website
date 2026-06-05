@@ -191,7 +191,115 @@
         }
 
         #comments .container {
-            max-width: 750px;
+            max-width: 650px;
+        }
+
+        .comment-form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 36px;
+        }
+
+        .comment-form input,
+        .comment-form textarea {
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 15px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        .comment-form input:focus,
+        .comment-form textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .comment-form textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .comment-form button {
+            align-self: flex-end;
+            padding: 12px 32px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .comment-form button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .comment-form button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .comment-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .comment-card {
+            background: #f8f9fa;
+            padding: 18px 20px;
+            border-radius: 12px;
+            text-align: left;
+            transition: transform 0.2s;
+        }
+
+        .comment-card:hover {
+            transform: translateX(4px);
+        }
+
+        .comment-card .comment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .comment-card .comment-name {
+            font-weight: 700;
+            color: #5b5ef7;
+            font-size: 15px;
+        }
+
+        .comment-card .comment-time {
+            font-size: 12px;
+            color: #aaa;
+        }
+
+        .comment-card .comment-text {
+            font-size: 15px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .comment-empty {
+            text-align: center;
+            color: #bbb;
+            padding: 30px 0;
+            font-size: 15px;
+        }
+
+        .comment-error {
+            text-align: center;
+            color: #e74c3c;
+            padding: 10px;
+            font-size: 14px;
         }
 
         /* ===== 联系区域 ===== */
@@ -341,7 +449,18 @@
     <section id="comments">
         <div class="container">
             <h2>💬 留言板</h2>
-            <div id="disqus_thread"></div>
+
+            <!-- 留言表单 -->
+            <form class="comment-form" id="commentForm">
+                <input type="text" id="commentName" placeholder="你的昵称" required maxlength="30">
+                <textarea id="commentMsg" placeholder="说点什么吧..." required maxlength="500"></textarea>
+                <button type="submit" id="submitBtn">💬 发布留言</button>
+            </form>
+
+            <!-- 留言列表 -->
+            <div class="comment-list" id="commentList">
+                <p class="comment-empty">加载中...</p>
+            </div>
         </div>
     </section>
 
@@ -371,20 +490,98 @@
         <p>© 2026 李玥琦 | 用 ❤️ 和 Claude Code 搭的第一个网页</p>
     </footer>
 
-    <!-- Disqus 留言板 -->
+    <!-- 原生留言板 -->
     <script>
-        var disqus_config = function () {
-            this.page.url = 'https://moxiaoyuuu.github.io/my-website/';
-            this.page.identifier = 'liyueqi-homepage';
-        };
-        (function() {
-            var d = document, s = d.createElement('script');
-            s.src = 'https://https-moxiaoyuuu-github-io-my-website.disqus.com/embed.js';
-            s.setAttribute('data-timestamp', +new Date());
-            (d.head || d.body).appendChild(s);
-        })();
+    (function() {
+        var BLOB_ID = '019e9851-3b24-7055-86cc-351d64b011c0';
+        var API_URL = 'https://jsonblob.com/api/jsonBlob/' + BLOB_ID;
+
+        var form = document.getElementById('commentForm');
+        var list = document.getElementById('commentList');
+        var submitBtn = document.getElementById('submitBtn');
+
+        // 加载留言
+        function loadComments() {
+            fetch(API_URL)
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    var comments = data.comments || [];
+                    if (comments.length === 0) {
+                        list.innerHTML = '<p class="comment-empty">✨ 还没有留言，来做第一个留言的人吧！</p>';
+                    } else {
+                        var html = '';
+                        comments.slice().reverse().forEach(function(c) {
+                            html += '<div class="comment-card">' +
+                                '<div class="comment-header">' +
+                                    '<span class="comment-name">' + escapeHtml(c.name) + '</span>' +
+                                    '<span class="comment-time">' + escapeHtml(c.time || '') + '</span>' +
+                                '</div>' +
+                                '<div class="comment-text">' + escapeHtml(c.message) + '</div>' +
+                            '</div>';
+                        });
+                        list.innerHTML = html;
+                    }
+                })
+                .catch(function() {
+                    list.innerHTML = '<p class="comment-error">加载留言失败，请刷新重试</p>';
+                });
+        }
+
+        // 提交留言
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            var name = document.getElementById('commentName').value.trim();
+            var msg = document.getElementById('commentMsg').value.trim();
+            if (!name || !msg) return;
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = '发送中...';
+
+            // 先获取当前列表
+            fetch(API_URL)
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    var comments = data.comments || [];
+                    var now = new Date();
+                    var timeStr = now.getFullYear() + '-' +
+                        pad(now.getMonth() + 1) + '-' +
+                        pad(now.getDate()) + ' ' +
+                        pad(now.getHours()) + ':' +
+                        pad(now.getMinutes());
+                    comments.push({ name: name, message: msg, time: timeStr });
+
+                    return fetch(API_URL, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ comments: comments })
+                    });
+                })
+                .then(function() {
+                    document.getElementById('commentName').value = '';
+                    document.getElementById('commentMsg').value = '';
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '💬 发布留言';
+                    loadComments();
+                })
+                .catch(function() {
+                    alert('留言失败，请重试');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '💬 发布留言';
+                });
+        });
+
+        function pad(n) { return n < 10 ? '0' + n : n; }
+
+        function escapeHtml(text) {
+            var div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        loadComments();
+    })();
     </script>
-    <noscript>请开启 JavaScript 以查看 <a href="https://disqus.com/?ref_noscript">留言板</a>。</noscript>
+    <noscript>请开启 JavaScript 以使用留言板。</noscript>
 
 </body>
 </html>
