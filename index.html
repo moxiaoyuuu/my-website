@@ -185,6 +185,207 @@
             line-height: 1.6;
         }
 
+        /* ===== 多肉养成游戏 ===== */
+        #succulent {
+            background: #fdfcf9;
+        }
+
+        #succulent .container {
+            max-width: 550px;
+        }
+
+        .game-box {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            text-align: center;
+        }
+
+        /* 花盆 + 植物 */
+        .plant-display {
+            position: relative;
+            width: 280px;
+            height: 300px;
+            margin: 0 auto 24px;
+        }
+
+        /* 花盆 */
+        .pot {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 90px;
+            background: linear-gradient(135deg, #d4956b, #c17d59);
+            border-radius: 8px 8px 30px 30px;
+            box-shadow: inset 0 8px 20px rgba(0,0,0,0.15), 0 4px 12px rgba(0,0,0,0.1);
+            z-index: 2;
+        }
+
+        .pot::after {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: -8px;
+            right: -8px;
+            height: 16px;
+            background: linear-gradient(135deg, #e0a980, #c98a65);
+            border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        /* 土壤 */
+        .soil {
+            position: absolute;
+            bottom: 82px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 84px;
+            height: 20px;
+            background: radial-gradient(ellipse, #8B6914, #6B4F12);
+            border-radius: 50%;
+            z-index: 3;
+        }
+
+        /* 多肉植物容器 */
+        .plant-body {
+            position: absolute;
+            bottom: 95px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
+            transition: all 1s ease;
+        }
+
+        /* 多肉叶子 */
+        .succulent-leaf {
+            position: absolute;
+            border-radius: 50%;
+            transition: all 0.8s ease;
+        }
+
+        /* 状态信息 */
+        .game-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 4px;
+        }
+
+        .stat-bar-bg {
+            height: 8px;
+            background: #eee;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .stat-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .stat-bar-fill.water { background: linear-gradient(90deg, #74b9ff, #0984e3); }
+        .stat-bar-fill.sun   { background: linear-gradient(90deg, #fdcb6e, #f39c12); }
+        .stat-bar-fill.fert  { background: linear-gradient(90deg, #a29bfe, #6c5ce7); }
+
+        .stat-value {
+            font-size: 12px;
+            color: #aaa;
+            margin-top: 2px;
+        }
+
+        /* 成长进度 */
+        .growth-info {
+            margin: 16px 0;
+        }
+
+        .growth-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 6px;
+        }
+
+        .growth-stars {
+            font-size: 20px;
+            letter-spacing: 4px;
+        }
+
+        /* 操作按钮 */
+        .game-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 16px;
+        }
+
+        .game-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 50px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .game-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .game-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .btn-water {
+            background: #dff9fb;
+            color: #0984e3;
+        }
+
+        .btn-sun {
+            background: #fff8e1;
+            color: #f39c12;
+        }
+
+        .btn-fertilize {
+            background: #f3eefb;
+            color: #6c5ce7;
+        }
+
+        .game-msg {
+            margin-top: 12px;
+            font-size: 14px;
+            color: #888;
+            min-height: 20px;
+            transition: all 0.3s;
+        }
+
+        .game-msg.good { color: #27ae60; }
+        .game-msg.warn { color: #f39c12; }
+        .game-msg.bad  { color: #e74c3c; }
+
+        .cooldown-text {
+            font-size: 11px;
+            color: #bbb;
+            margin-top: 8px;
+        }
+
         /* ===== 留言板 ===== */
         #comments {
             background: white;
@@ -420,6 +621,7 @@
                 <li><a href="#home">首页</a></li>
                 <li><a href="#about">关于我</a></li>
                 <li><a href="#hobbies">兴趣爱好</a></li>
+                <li><a href="#succulent">🪴 多肉</a></li>
                 <li><a href="#comments">留言板</a></li>
                 <li><a href="#contact">联系我</a></li>
             </ul>
@@ -485,6 +687,63 @@
         </div>
     </section>
 
+    <!-- ===== 多肉养成 ===== -->
+    <section id="succulent">
+        <div class="container">
+            <h2>🪴 多肉养成</h2>
+            <div class="game-box">
+                <!-- 植物展示 -->
+                <div class="plant-display" id="plantDisplay">
+                    <!-- JS 动态渲染 -->
+                </div>
+
+                <!-- 成长阶段 -->
+                <div class="growth-info">
+                    <div class="growth-label">成长阶段：<strong id="stageName">种子</strong></div>
+                    <div class="growth-stars" id="stageStars">⭐</div>
+                </div>
+
+                <!-- 状态条 -->
+                <div class="game-stats">
+                    <div class="stat-item">
+                        <div class="stat-label">💧 水分</div>
+                        <div class="stat-bar-bg"><div class="stat-bar-fill water" id="waterBar" style="width:50%"></div></div>
+                        <div class="stat-value" id="waterVal">50</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">☀️ 阳光</div>
+                        <div class="stat-bar-bg"><div class="stat-bar-fill sun" id="sunBar" style="width:50%"></div></div>
+                        <div class="stat-value" id="sunVal">50</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">🧪 肥料</div>
+                        <div class="stat-bar-bg"><div class="stat-bar-fill fert" id="fertBar" style="width:0%"></div></div>
+                        <div class="stat-value" id="fertVal">0</div>
+                    </div>
+                </div>
+
+                <!-- 成长进度条 -->
+                <div class="growth-info" style="margin-top:6px;">
+                    <div class="stat-label">📈 成长值</div>
+                    <div class="stat-bar-bg" style="height:10px;max-width:300px;margin:0 auto;">
+                        <div class="stat-bar-fill" id="growthBar" style="width:0%;background:linear-gradient(90deg,#55efc4,#00b894);"></div>
+                    </div>
+                </div>
+
+                <!-- 操作按钮 -->
+                <div class="game-actions">
+                    <button class="game-btn btn-water" id="btnWater">💧 浇水</button>
+                    <button class="game-btn btn-sun" id="btnSun">☀️ 晒太阳</button>
+                    <button class="game-btn btn-fertilize" id="btnFert">🧪 施肥</button>
+                </div>
+
+                <!-- 提示信息 -->
+                <div class="game-msg" id="gameMsg"></div>
+                <div class="cooldown-text" id="cooldown"></div>
+            </div>
+        </div>
+    </section>
+
     <!-- ===== 留言板 ===== -->
     <section id="comments">
         <div class="container">
@@ -530,6 +789,248 @@
     <footer>
         <p>© 2026 李玥琦 | 用 ❤️ 和 Claude Code 搭的第一个网页</p>
     </footer>
+
+    <!-- 多肉养成游戏 -->
+    <script>
+    (function() {
+        var COOLDOWN_WATER = 4 * 60 * 60 * 1000;    // 4小时
+        var COOLDOWN_SUN = 4 * 60 * 60 * 1000;       // 4小时
+        var COOLDOWN_FERT = 8 * 60 * 60 * 1000;      // 8小时
+        var DECAY_INTERVAL = 30 * 60 * 1000;          // 每30分钟衰减
+
+        // 默认状态
+        var DEFAULT = {
+            water: 50, sun: 50, fertilizer: 0,
+            growth: 0, stage: 0,
+            lastWater: 0, lastSun: 0, lastFert: 0,
+            lastDecay: Date.now()
+        };
+
+        // 从 localStorage 加载
+        var state = loadState();
+
+        function loadState() {
+            try { var s = JSON.parse(localStorage.getItem('succulent_game')); return s || Object.assign({}, DEFAULT); }
+            catch(e) { return Object.assign({}, DEFAULT); }
+        }
+
+        function saveState() { localStorage.setItem('succulent_game', JSON.stringify(state)); }
+
+        // 成长阶段定义
+        var STAGES = [
+            { name: '种子',   icon: '🌰', stars: '⭐',         growthMax: 20 },
+            { name: '小芽',   icon: '🌱', stars: '⭐⭐',       growthMax: 40 },
+            { name: '小多肉', icon: '🪴', stars: '⭐⭐⭐',     growthMax: 60 },
+            { name: '大多肉', icon: '🌿', stars: '⭐⭐⭐⭐',   growthMax: 80 },
+            { name: '盛开花', icon: '🌸', stars: '⭐⭐⭐⭐⭐', growthMax: 100 }
+        ];
+
+        function getStage() {
+            var g = state.growth;
+            if (g < 20) return 0;
+            if (g < 40) return 1;
+            if (g < 60) return 2;
+            if (g < 80) return 3;
+            return 4;
+        }
+
+        function updateStage() {
+            state.stage = getStage();
+            var s = STAGES[state.stage];
+            document.getElementById('stageName').textContent = s.icon + ' ' + s.name;
+            document.getElementById('stageStars').textContent = s.stars;
+        }
+
+        function updateBars() {
+            document.getElementById('waterBar').style.width = state.water + '%';
+            document.getElementById('sunBar').style.width = state.sun + '%';
+            document.getElementById('fertBar').style.width = state.fertilizer + '%';
+            document.getElementById('growthBar').style.width = state.growth + '%';
+            document.getElementById('waterVal').textContent = state.water;
+            document.getElementById('sunVal').textContent = state.sun;
+            document.getElementById('fertVal').textContent = state.fertilizer;
+        }
+
+        // 绘制多肉植物
+        function drawSucculent() {
+            var container = document.getElementById('plantDisplay');
+            var stage = state.stage;
+            var health = (state.water + state.sun) / 2;
+
+            // 花盆 + 土壤 (静态)
+            var html = '<div class="pot"></div><div class="soil"></div><div class="plant-body" style="bottom:95px;">';
+
+            var leafCount, baseSize, colors;
+
+            // 根据阶段设定
+            if (stage === 0) { leafCount = 0; baseSize = 0; }
+            else if (stage === 1) { leafCount = 3; baseSize = 12; }
+            else if (stage === 2) { leafCount = 7; baseSize = 16; }
+            else if (stage === 3) { leafCount = 12; baseSize = 20; }
+            else { leafCount = 18; baseSize = 24; }
+
+            // 颜色根据健康度调整
+            var r, g, b;
+            if (health >= 60 && health <= 80) {
+                r = 85; g = 170; b = 110; // 健康绿
+            } else if (health > 80) {
+                r = 100; g = 160; b = 90;  // 水多偏暗
+            } else if (health < 25) {
+                r = 180; g = 170; b = 100; // 缺水偏黄
+            } else {
+                r = 110; g = 165; b = 115; // 正常
+            }
+
+            // 画叶子
+            for (var i = 0; i < leafCount; i++) {
+                var angle = (i / leafCount) * Math.PI * 2 - Math.PI / 2;
+                var dist = baseSize * (0.3 + 0.7 * ((i % 3) / 2));
+                var leafSize = baseSize * (0.6 + 0.4 * ((i % 4) / 3));
+                var x = Math.cos(angle) * dist;
+                var y = Math.sin(angle) * dist - 10;
+                var rotate = (angle * 180 / Math.PI) + 90;
+
+                // 叶尖颜色随健康度变化
+                var tipColor;
+                if (health >= 60 && health <= 80) {
+                    tipColor = 'rgba(220,120,130,0.5)'; // 粉红尖
+                } else if (health > 80) {
+                    tipColor = 'rgba(150,130,100,0.4)'; // 暗尖
+                } else {
+                    tipColor = 'rgba(180,150,130,0.3)'; // 淡尖
+                }
+
+                html += '<div class="succulent-leaf" style="' +
+                    'width:' + leafSize + 'px;' +
+                    'height:' + (leafSize * 1.6) + 'px;' +
+                    'background:radial-gradient(ellipse at 50% 20%, ' + tipColor + ', rgba('+r+','+g+','+b+',0.9) 40%);'+
+                    'left:' + x + 'px;' +
+                    'top:' + y + 'px;' +
+                    'transform:rotate(' + rotate + 'deg);' +
+                    'border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;' +
+                '"></div>';
+            }
+
+            // 如果开花阶段，加一朵小花
+            if (stage === 4) {
+                html += '<div style="position:absolute;top:-35px;left:5px;font-size:28px;animation: float 2s ease-in-out infinite;">🌸</div>';
+            }
+
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        function updateCooldowns() {
+            var now = Date.now();
+            var texts = [];
+            var wRemain = state.lastWater + COOLDOWN_WATER - now;
+            var sRemain = state.lastSun + COOLDOWN_SUN - now;
+            var fRemain = state.lastFert + COOLDOWN_FERT - now;
+
+            document.getElementById('btnWater').disabled = wRemain > 0;
+            document.getElementById('btnSun').disabled = sRemain > 0;
+            document.getElementById('btnFert').disabled = fRemain > 0;
+
+            if (wRemain > 0) texts.push('浇水 ' + formatRemain(wRemain));
+            if (sRemain > 0) texts.push('晒太阳 ' + formatRemain(sRemain));
+            if (fRemain > 0) texts.push('施肥 ' + formatRemain(fRemain));
+
+            document.getElementById('cooldown').textContent = texts.length > 0 ? '⏳ 冷却中：' + texts.join(' | ') : '';
+        }
+
+        function formatRemain(ms) {
+            var m = Math.ceil(ms / 60000);
+            if (m >= 60) return Math.floor(m/60) + '小时' + (m%60>0 ? m%60+'分' : '');
+            return m + '分钟';
+        }
+
+        function showMsg(text, cls) {
+            var el = document.getElementById('gameMsg');
+            el.textContent = text;
+            el.className = 'game-msg ' + (cls || '');
+            setTimeout(function() { el.textContent = ''; el.className = 'game-msg'; }, 4000);
+        }
+
+        function doWater() {
+            if (state.water >= 95) { showMsg('💧 水太多了，多肉不喜欢泡在水里！', 'warn'); return; }
+            state.water = Math.min(100, state.water + 25);
+            state.lastWater = Date.now();
+            updateBars();
+            saveState();
+            drawSucculent();
+            updateCooldowns();
+            showMsg('💧 浇水完成！多肉开心地喝饱了~', 'good');
+        }
+
+        function doSun() {
+            if (state.sun >= 95) { showMsg('☀️ 阳光太强了，多肉会晒伤的！', 'warn'); return; }
+            state.sun = Math.min(100, state.sun + 25);
+            state.lastSun = Date.now();
+            updateBars();
+            saveState();
+            drawSucculent();
+            updateCooldowns();
+            showMsg('☀️ 享受了温暖的阳光！', 'good');
+        }
+
+        function doFert() {
+            if (state.fertilizer >= 80) { showMsg('🧪 肥料已经够多了，再加会烧根！', 'warn'); return; }
+            state.fertilizer = Math.min(100, state.fertilizer + 35);
+            state.lastFert = Date.now();
+            updateBars();
+            saveState();
+            drawSucculent();
+            updateCooldowns();
+            showMsg('🧪 施肥成功！营养满满~', 'good');
+        }
+
+        // 自然衰减 + 成长
+        function tickDecay() {
+            var now = Date.now();
+            var elapsed = now - state.lastDecay;
+            var intervals = Math.floor(elapsed / DECAY_INTERVAL);
+
+            if (intervals > 0) {
+                state.water = Math.max(0, state.water - intervals * 2);
+                state.sun = Math.max(0, state.sun - intervals * 2);
+                state.fertilizer = Math.max(0, state.fertilizer - intervals * 1);
+
+                // 成长计算
+                var avg = (state.water + state.sun) / 2;
+                if (avg >= 30 && avg <= 80) {
+                    state.growth = Math.min(100, state.growth + intervals * (1 + (state.fertilizer > 20 ? 1 : 0)));
+                } else if (avg < 15) {
+                    state.growth = Math.max(0, state.growth - intervals * 1);
+                }
+
+                state.lastDecay = now - (elapsed % DECAY_INTERVAL);
+
+                updateBars();
+                updateStage();
+                saveState();
+                drawSucculent();
+            }
+        }
+
+        // 初始化
+        tickDecay();
+        updateBars();
+        updateStage();
+        drawSucculent();
+        updateCooldowns();
+
+        // 绑定按钮
+        document.getElementById('btnWater').addEventListener('click', doWater);
+        document.getElementById('btnSun').addEventListener('click', doSun);
+        document.getElementById('btnFert').addEventListener('click', doFert);
+
+        // 每分钟检查一次衰减和冷却
+        setInterval(function() {
+            tickDecay();
+            updateCooldowns();
+        }, 60000);
+    })();
+    </script>
 
     <!-- 原生留言板（基于 GitHub Issues） -->
     <script>
