@@ -391,6 +391,149 @@
             50% { transform: translateY(-6px); }
         }
 
+        /* 昵称输入 */
+        .nickname-area {
+            margin-bottom: 16px;
+        }
+
+        .nickname-area input {
+            padding: 10px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 15px;
+            text-align: center;
+            font-family: inherit;
+            width: 180px;
+            transition: border-color 0.3s;
+        }
+
+        .nickname-area input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        /* 展示柜 */
+        .collection-shelf {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .shelf-title {
+            width: 100%;
+            text-align: center;
+            font-size: 16px;
+            color: #888;
+            margin-bottom: 4px;
+        }
+
+        .shelf-slot {
+            width: 62px;
+            height: 72px;
+            border-radius: 12px;
+            background: #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            transition: all 0.5s ease;
+            position: relative;
+        }
+
+        .shelf-slot.collected {
+            background: #f8fdf8;
+            border: 2px solid #a0d8a8;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .shelf-slot .slot-name {
+            font-size: 10px;
+            color: #aaa;
+            margin-top: 2px;
+        }
+
+        .shelf-slot.collected .slot-name {
+            color: #666;
+            font-weight: 600;
+        }
+
+        .shelf-slot .rarity-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            font-size: 10px;
+        }
+
+        /* 操作日志 */
+        .action-log {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #eee;
+            text-align: left;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .action-log .log-title {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .action-log .log-item {
+            font-size: 13px;
+            color: #777;
+            padding: 4px 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .action-log .log-item .log-grow {
+            color: #27ae60;
+            font-weight: 600;
+        }
+
+        /* 贡献榜 */
+        .leaderboard {
+            margin-top: 16px;
+            padding-top: 12px;
+            border-top: 1px solid #eee;
+            text-align: center;
+        }
+
+        .leaderboard .lb-title {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 6px;
+        }
+
+        .leaderboard .lb-row {
+            display: inline-block;
+            padding: 4px 12px;
+            margin: 2px 4px;
+            background: #f8f9fa;
+            border-radius: 20px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .leaderboard .lb-row .lb-count {
+            font-weight: 700;
+            color: #5b5ef7;
+        }
+
+        .shelf-progress {
+            text-align: center;
+            font-size: 14px;
+            color: #888;
+            margin-top: 12px;
+        }
+
         /* ===== 留言板 ===== */
         #comments {
             background: white;
@@ -697,15 +840,19 @@
         <div class="container">
             <h2>🪴 多肉养成</h2>
             <div class="game-box">
-                <!-- 植物展示 -->
-                <div class="plant-display" id="plantDisplay">
-                    <!-- JS 动态渲染 -->
+                <!-- 昵称 -->
+                <div class="nickname-area">
+                    <input type="text" id="nickname" placeholder="输入你的昵称" maxlength="12">
                 </div>
+
+                <!-- 植物展示 -->
+                <div class="plant-display" id="plantDisplay"></div>
 
                 <!-- 成长阶段 -->
                 <div class="growth-info">
-                    <div class="growth-label">成长阶段：<strong id="stageName">种子</strong></div>
+                    <div class="growth-label">成长阶段：<strong id="stageName">🌰 种子</strong></div>
                     <div class="growth-stars" id="stageStars">⭐</div>
+                    <div class="shelf-progress" id="shelfProgress"></div>
                 </div>
 
                 <!-- 状态条 -->
@@ -742,9 +889,25 @@
                     <button class="game-btn btn-fertilize" id="btnFert">🧪 施肥</button>
                 </div>
 
-                <!-- 提示信息 -->
                 <div class="game-msg" id="gameMsg"></div>
                 <div class="cooldown-text" id="cooldown"></div>
+
+                <!-- 贡献榜 -->
+                <div class="leaderboard" id="leaderboard" style="display:none;">
+                    <div class="lb-title">🏅 贡献榜</div>
+                    <div id="lbContent"></div>
+                </div>
+
+                <!-- 操作日志 -->
+                <div class="action-log" id="actionLog" style="display:none;">
+                    <div class="log-title">📜 最近动态</div>
+                    <div id="logContent"></div>
+                </div>
+
+                <!-- 展示柜 -->
+                <div class="collection-shelf" id="collectionShelf">
+                    <div class="shelf-title">🏆 多肉展示柜</div>
+                </div>
             </div>
         </div>
     </section>
@@ -795,43 +958,45 @@
         <p>© 2026 李玥琦 | 用 ❤️ 和 Claude Code 搭的第一个网页</p>
     </footer>
 
-    <!-- 多肉养成游戏 -->
+    <!-- 多肉养成游戏（多人共享版） -->
     <script>
     (function() {
-        var COOLDOWN_WATER = 4 * 60 * 60 * 1000;    // 4小时
-        var COOLDOWN_SUN = 4 * 60 * 60 * 1000;       // 4小时
-        var COOLDOWN_FERT = 8 * 60 * 60 * 1000;      // 8小时
-        var DECAY_INTERVAL = 30 * 60 * 1000;          // 每30分钟衰减
-
-        // 默认状态
-        var DEFAULT = {
-            water: 50, sun: 50, fertilizer: 0,
-            growth: 0, stage: 0,
-            lastWater: 0, lastSun: 0, lastFert: 0,
-            lastDecay: Date.now()
-        };
-
-        // 从 localStorage 加载
-        var state = loadState();
-
-        function loadState() {
-            try { var s = JSON.parse(localStorage.getItem('succulent_game')); return s || Object.assign({}, DEFAULT); }
-            catch(e) { return Object.assign({}, DEFAULT); }
-        }
-
-        function saveState() { localStorage.setItem('succulent_game', JSON.stringify(state)); }
-
-        // 成长阶段定义
-        var STAGES = [
-            { name: '种子',   icon: '🌰', stars: '⭐',         growthMax: 20 },
-            { name: '小芽',   icon: '🌱', stars: '⭐⭐',       growthMax: 40 },
-            { name: '小多肉', icon: '🪴', stars: '⭐⭐⭐',     growthMax: 60 },
-            { name: '大多肉', icon: '🌿', stars: '⭐⭐⭐⭐',   growthMax: 80 },
-            { name: '盛开花', icon: '🌸', stars: '⭐⭐⭐⭐⭐', growthMax: 100 }
+        var API = 'https://my-website-henna-gamma.vercel.app/api/succulent';
+        var SPECIES_LIST = [
+            { id:0, name:'粉月影', emoji:'🌸', rarity:'common', r:'#e8b4b8', tip:'#f2a7b0', leaf:'#a8d8a8', rarityLabel:'普通' },
+            { id:1, name:'紫珍珠', emoji:'🔮', rarity:'common', r:'#c9b1d9', tip:'#b38cc7', leaf:'#9db89e', rarityLabel:'普通' },
+            { id:2, name:'红宝石', emoji:'🔥', rarity:'common', r:'#d4956b', tip:'#e8734a', leaf:'#8cb88a', rarityLabel:'普通' },
+            { id:3, name:'冰玉', emoji:'❄️', rarity:'common', r:'#b8d8e8', tip:'#a0d0e8', leaf:'#a0c8b0', rarityLabel:'普通' },
+            { id:4, name:'月光仙子', emoji:'🌙', rarity:'common', r:'#d8d8c8', tip:'#e8e0d0', leaf:'#b0c0a0', rarityLabel:'普通' },
+            { id:5, name:'蜜桃仙子', emoji:'🍑', rarity:'common', r:'#f0c8b0', tip:'#f5a090', leaf:'#a8c898', rarityLabel:'普通' },
+            { id:6, name:'海蓝宝', emoji:'🌊', rarity:'rare', r:'#88c8d8', tip:'#68b8d0', leaf:'#90b890', rarityLabel:'稀有' },
+            { id:7, name:'橘子汽水', emoji:'🍊', rarity:'rare', r:'#e8b080', tip:'#f09850', leaf:'#a0c090', rarityLabel:'稀有' },
+            { id:8, name:'黑王子', emoji:'🌟', rarity:'rare', r:'#6a5a6a', tip:'#8a6a8a', leaf:'#6a8a6a', rarityLabel:'稀有' },
+            { id:9, name:'彩虹糖', emoji:'🌈', rarity:'super_rare', r:'#e8d0c8', tip:'#d8a0b8', leaf:'#98c898', rarityLabel:'超稀有' }
         ];
 
-        function getStage() {
-            var g = state.growth;
+        var STAGES = [
+            { name:'种子', icon:'🌰', stars:'⭐', min:0 },
+            { name:'小芽', icon:'🌱', stars:'⭐⭐', min:20 },
+            { name:'小多肉', icon:'🪴', stars:'⭐⭐⭐', min:40 },
+            { name:'大多肉', icon:'🌿', stars:'⭐⭐⭐⭐', min:60 },
+            { name:'盛开花', icon:'🌸', stars:'⭐⭐⭐⭐⭐', min:80 }
+        ];
+
+        var state = {};
+        var actions = [];
+        var speciesInfo = null;
+        var nickname = localStorage.getItem('succulent_nick') || '';
+
+        // 初始化昵称
+        var nickInput = document.getElementById('nickname');
+        nickInput.value = nickname;
+        nickInput.addEventListener('change', function() {
+            nickname = this.value.trim();
+            localStorage.setItem('succulent_nick', nickname);
+        });
+
+        function getStage(g) {
             if (g < 20) return 0;
             if (g < 40) return 1;
             if (g < 60) return 2;
@@ -839,86 +1004,115 @@
             return 4;
         }
 
-        function updateStage() {
-            state.stage = getStage();
-            var s = STAGES[state.stage];
-            document.getElementById('stageName').textContent = s.icon + ' ' + s.name;
-            document.getElementById('stageStars').textContent = s.stars;
+        function fetchState() {
+            fetch(API)
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (!data.ok) return;
+                    state = data.state;
+                    actions = data.actions || [];
+                    speciesInfo = data.currentSpeciesInfo || null;
+                    updateAll();
+                })
+                .catch(function() {
+                    document.getElementById('gameMsg').textContent = '加载失败，请刷新';
+                });
+        }
+
+        function updateAll() {
+            updateBars();
+            updateStage();
+            drawSucculent();
+            updateCooldowns();
+            renderShelf();
+            renderLog();
+            renderLeaderboard();
         }
 
         function updateBars() {
             document.getElementById('waterBar').style.width = state.water + '%';
             document.getElementById('sunBar').style.width = state.sun + '%';
-            document.getElementById('fertBar').style.width = state.fertilizer + '%';
-            document.getElementById('growthBar').style.width = state.growth + '%';
+            document.getElementById('fertBar').style.width = (state.fertilizer||0) + '%';
+            document.getElementById('growthBar').style.width = (state.growth||0) + '%';
             document.getElementById('waterVal').textContent = state.water;
             document.getElementById('sunVal').textContent = state.sun;
-            document.getElementById('fertVal').textContent = state.fertilizer;
+            document.getElementById('fertVal').textContent = state.fertilizer || 0;
         }
 
-        // 绘制多肉植物
+        function updateStage() {
+            var g = state.growth || 0;
+            var stg = getStage(g);
+            var s = STAGES[stg];
+            var nameText = s.icon + ' ' + s.name;
+
+            // 如果长成了，显示物种名
+            if (g >= 100 && speciesInfo && !speciesInfo.hint) {
+                nameText = speciesInfo.emoji + ' ' + speciesInfo.name + ' (' + speciesInfo.rarityLabel + ')';
+            } else if (g >= 60 && speciesInfo && speciesInfo.hint) {
+                nameText = s.icon + ' ???（似乎有点特别...）';
+            }
+
+            document.getElementById('stageName').textContent = nameText;
+            document.getElementById('stageStars').textContent = s.stars;
+
+            // 进度文字
+            var collected = (state.collectionRevealed || []).length;
+            document.getElementById('shelfProgress').textContent = '已收集：' + collected + ' / 10 种多肉';
+        }
+
         function drawSucculent() {
             var container = document.getElementById('plantDisplay');
-            var stage = state.stage;
-            var health = (state.water + state.sun) / 2;
+            var g = state.growth || 0;
+            var stage = getStage(g);
+            var health = ((state.water||50) + (state.sun||50)) / 2;
 
-            // 花盆 + 土壤 (静态)
-            var html = '<div class="pot"></div><div class="soil"></div><div class="plant-body" style="bottom:95px;">';
+            // 根据物种和阶段决定颜色
+            var r = 110, gr = 165, b = 115; // 默认绿
+            var tipColor = 'rgba(220,150,150,0.4)';
 
-            var leafCount, baseSize, colors;
+            if (speciesInfo) {
+                if (!speciesInfo.hint || g >= 40) {
+                    // 解析颜色
+                    var cr = speciesInfo.color || speciesInfo.r || '#a8d8a8';
+                    var ct = speciesInfo.tip || speciesInfo.tip || '#e8b0b0';
+                    r = parseInt(cr.slice(1,3), 16);
+                    gr = parseInt(cr.slice(3,5), 16);
+                    b = parseInt(cr.slice(5,7), 16);
+                    tipColor = ct + '99';
+                }
+            }
 
-            // 根据阶段设定
+            if (health < 25) { r = 170; gr = 165; b = 110; }
+            if (health > 85) { r = Math.min(255,r+20); gr = Math.max(0,gr-20); b = Math.max(0,b-20); }
+
+            var leafCount, baseSize;
             if (stage === 0) { leafCount = 0; baseSize = 0; }
             else if (stage === 1) { leafCount = 3; baseSize = 12; }
             else if (stage === 2) { leafCount = 7; baseSize = 16; }
-            else if (stage === 3) { leafCount = 12; baseSize = 20; }
-            else { leafCount = 18; baseSize = 24; }
+            else if (stage === 3) { leafCount = 13; baseSize = 20; }
+            else { leafCount = 20; baseSize = 25; }
 
-            // 颜色根据健康度调整
-            var r, g, b;
-            if (health >= 60 && health <= 80) {
-                r = 85; g = 170; b = 110; // 健康绿
-            } else if (health > 80) {
-                r = 100; g = 160; b = 90;  // 水多偏暗
-            } else if (health < 25) {
-                r = 180; g = 170; b = 100; // 缺水偏黄
-            } else {
-                r = 110; g = 165; b = 115; // 正常
-            }
+            var html = '<div class="pot"></div><div class="soil"></div><div class="plant-body" style="bottom:95px;">';
 
-            // 画叶子
             for (var i = 0; i < leafCount; i++) {
                 var angle = (i / leafCount) * Math.PI * 2 - Math.PI / 2;
-                var dist = baseSize * (0.3 + 0.7 * ((i % 3) / 2));
-                var leafSize = baseSize * (0.6 + 0.4 * ((i % 4) / 3));
+                var dist = baseSize * (0.25 + 0.75 * ((i % 5) / 4));
+                var leafSz = baseSize * (0.5 + 0.5 * ((i % 4) / 3));
                 var x = Math.cos(angle) * dist;
                 var y = Math.sin(angle) * dist - 10;
-                var rotate = (angle * 180 / Math.PI) + 90;
-
-                // 叶尖颜色随健康度变化
-                var tipColor;
-                if (health >= 60 && health <= 80) {
-                    tipColor = 'rgba(220,120,130,0.5)'; // 粉红尖
-                } else if (health > 80) {
-                    tipColor = 'rgba(150,130,100,0.4)'; // 暗尖
-                } else {
-                    tipColor = 'rgba(180,150,130,0.3)'; // 淡尖
-                }
+                var rot = (angle * 180 / Math.PI) + 90;
 
                 html += '<div class="succulent-leaf" style="' +
-                    'width:' + leafSize + 'px;' +
-                    'height:' + (leafSize * 1.6) + 'px;' +
-                    'background:radial-gradient(ellipse at 50% 20%, ' + tipColor + ', rgba('+r+','+g+','+b+',0.9) 40%);'+
-                    'left:' + x + 'px;' +
-                    'top:' + y + 'px;' +
-                    'transform:rotate(' + rotate + 'deg);' +
+                    'width:' + leafSz + 'px;height:' + (leafSz*1.6) + 'px;' +
+                    'background:radial-gradient(ellipse at 50% 20%, ' + tipColor + ', rgba('+r+','+gr+','+b+',0.9) 40%);' +
+                    'left:' + x + 'px;top:' + y + 'px;' +
+                    'transform:rotate(' + rot + 'deg);' +
                     'border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;' +
                 '"></div>';
             }
 
-            // 如果开花阶段，加一朵小花
-            if (stage === 4) {
-                html += '<div style="position:absolute;top:-35px;left:5px;font-size:28px;animation: float 2s ease-in-out infinite;">🌸</div>';
+            if (g >= 100 && speciesInfo && !speciesInfo.hint) {
+                html += '<div style="position:absolute;top:-38px;left:5px;font-size:30px;animation:float 2s ease-in-out infinite;">' + speciesInfo.emoji + '</div>';
             }
 
             html += '</div>';
@@ -927,113 +1121,145 @@
 
         function updateCooldowns() {
             var now = Date.now();
+            var cds = state.cooldowns || {};
+            var userCD = cds[nickname] || {};
+            var CD = { water: 2*60*60*1000, sun: 2*60*60*1000, fertilize: 4*60*60*1000 };
+            var names = { water: '浇水', sun: '晒太阳', fertilize: '施肥' };
+
             var texts = [];
-            var wRemain = state.lastWater + COOLDOWN_WATER - now;
-            var sRemain = state.lastSun + COOLDOWN_SUN - now;
-            var fRemain = state.lastFert + COOLDOWN_FERT - now;
+            ['water','sun','fertilize'].forEach(function(act) {
+                var last = userCD[act] || 0;
+                var remain = last + CD[act] - now;
+                var btn = document.getElementById(act==='water'?'btnWater':act==='sun'?'btnSun':'btnFert');
+                btn.disabled = remain > 0;
+                if (remain > 0) {
+                    var m = Math.ceil(remain/60000);
+                    texts.push(names[act] + ' ' + (m>=60 ? Math.floor(m/60)+'时'+(m%60>0?m%60+'分':'') : m+'分'));
+                }
+            });
 
-            document.getElementById('btnWater').disabled = wRemain > 0;
-            document.getElementById('btnSun').disabled = sRemain > 0;
-            document.getElementById('btnFert').disabled = fRemain > 0;
-
-            if (wRemain > 0) texts.push('浇水 ' + formatRemain(wRemain));
-            if (sRemain > 0) texts.push('晒太阳 ' + formatRemain(sRemain));
-            if (fRemain > 0) texts.push('施肥 ' + formatRemain(fRemain));
-
-            document.getElementById('cooldown').textContent = texts.length > 0 ? '⏳ 冷却中：' + texts.join(' | ') : '';
+            document.getElementById('cooldown').textContent = texts.length > 0 ? '⏳ ' + (nickname||'你') + '的冷却：' + texts.join(' | ') : '';
         }
 
-        function formatRemain(ms) {
-            var m = Math.ceil(ms / 60000);
-            if (m >= 60) return Math.floor(m/60) + '小时' + (m%60>0 ? m%60+'分' : '');
-            return m + '分钟';
+        function doAction(action) {
+            var name = nickname.trim();
+            if (!name) { showMsg('请先输入昵称！', 'warn'); return; }
+
+            var btn = document.getElementById(action==='water'?'btnWater':action==='sun'?'btnSun':'btnFert');
+            btn.disabled = true;
+
+            fetch(API, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: action, name: name })
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.ok) {
+                    state = data.state;
+                    if (data.action) actions.push(data.action);
+                    updateAll();
+                    if (data.grownUp) {
+                        showMsg('🎉 多肉长成了！是 ' + data.completedSpecies.emoji + ' ' + data.completedSpecies.name + '（' + data.completedSpecies.rarityLabel + '）！已收入展示柜！', 'good');
+                    } else {
+                        var msgs = { water: '💧 浇水完成！', sun: '☀️ 晒太阳完成！', fertilize: '🧪 施肥完成！' };
+                        showMsg(msgs[action], 'good');
+                    }
+                } else {
+                    showMsg(data.error || '操作失败', 'warn');
+                }
+                updateCooldowns();
+            })
+            .catch(function() {
+                showMsg('网络错误，请重试', 'bad');
+                btn.disabled = false;
+            });
         }
 
         function showMsg(text, cls) {
             var el = document.getElementById('gameMsg');
             el.textContent = text;
             el.className = 'game-msg ' + (cls || '');
-            setTimeout(function() { el.textContent = ''; el.className = 'game-msg'; }, 4000);
+            setTimeout(function() { el.textContent = ''; el.className = 'game-msg'; }, 5000);
         }
 
-        function doWater() {
-            if (state.water >= 95) { showMsg('💧 水太多了，多肉不喜欢泡在水里！', 'warn'); return; }
-            state.water = Math.min(100, state.water + 25);
-            state.lastWater = Date.now();
-            updateBars();
-            saveState();
-            drawSucculent();
-            updateCooldowns();
-            showMsg('💧 浇水完成！多肉开心地喝饱了~', 'good');
-        }
-
-        function doSun() {
-            if (state.sun >= 95) { showMsg('☀️ 阳光太强了，多肉会晒伤的！', 'warn'); return; }
-            state.sun = Math.min(100, state.sun + 25);
-            state.lastSun = Date.now();
-            updateBars();
-            saveState();
-            drawSucculent();
-            updateCooldowns();
-            showMsg('☀️ 享受了温暖的阳光！', 'good');
-        }
-
-        function doFert() {
-            if (state.fertilizer >= 80) { showMsg('🧪 肥料已经够多了，再加会烧根！', 'warn'); return; }
-            state.fertilizer = Math.min(100, state.fertilizer + 35);
-            state.lastFert = Date.now();
-            updateBars();
-            saveState();
-            drawSucculent();
-            updateCooldowns();
-            showMsg('🧪 施肥成功！营养满满~', 'good');
-        }
-
-        // 自然衰减 + 成长
-        function tickDecay() {
-            var now = Date.now();
-            var elapsed = now - state.lastDecay;
-            var intervals = Math.floor(elapsed / DECAY_INTERVAL);
-
-            if (intervals > 0) {
-                state.water = Math.max(0, state.water - intervals * 2);
-                state.sun = Math.max(0, state.sun - intervals * 2);
-                state.fertilizer = Math.max(0, state.fertilizer - intervals * 1);
-
-                // 成长计算
-                var avg = (state.water + state.sun) / 2;
-                if (avg >= 30 && avg <= 80) {
-                    state.growth = Math.min(100, state.growth + intervals * (1 + (state.fertilizer > 20 ? 1 : 0)));
-                } else if (avg < 15) {
-                    state.growth = Math.max(0, state.growth - intervals * 1);
-                }
-
-                state.lastDecay = now - (elapsed % DECAY_INTERVAL);
-
-                updateBars();
-                updateStage();
-                saveState();
-                drawSucculent();
+        // ===== 展示柜 =====
+        function renderShelf() {
+            var collected = state.collectionRevealed || [];
+            var html = '<div class="shelf-title">🏆 多肉展示柜</div>';
+            for (var i = 0; i < 10; i++) {
+                var sp = SPECIES_LIST.find(function(s) { return s.id === i; });
+                var has = collected.indexOf(i) >= 0;
+                var rarityMark = sp.rarity === 'super_rare' ? '💎' : sp.rarity === 'rare' ? '✨' : '';
+                html += '<div class="shelf-slot' + (has ? ' collected' : '') + '">' +
+                    (has ? sp.emoji : '❓') +
+                    (rarityMark ? '<span class="rarity-badge">' + rarityMark + '</span>' : '') +
+                    '<span class="slot-name">' + (has ? sp.name : '???') + '</span>' +
+                '</div>';
             }
+            document.getElementById('collectionShelf').innerHTML = html;
         }
 
-        // 初始化
-        tickDecay();
-        updateBars();
-        updateStage();
-        drawSucculent();
-        updateCooldowns();
+        // ===== 操作日志 =====
+        function renderLog() {
+            var logDiv = document.getElementById('actionLog');
+            var content = document.getElementById('logContent');
+            if (actions.length === 0) {
+                logDiv.style.display = 'none';
+                return;
+            }
+            logDiv.style.display = 'block';
+            var html = '';
+            actions.forEach(function(a) {
+                var cls = a.grownUp ? 'log-grow' : '';
+                var extra = a.grownUp ? ' 🎉长成了' + a.speciesEmoji + a.species + '！已收入展示柜！' : '';
+                html += '<div class="log-item">' +
+                    a.emoji + ' <strong>' + escapeHtml(a.name) + '</strong> ' + a.msg +
+                    ' <span style="color:#bbb;font-size:11px;">' + (a.time||'') + '</span>' +
+                    (extra ? ' <span class="' + cls + '">' + extra + '</span>' : '') +
+                '</div>';
+            });
+            content.innerHTML = html;
+        }
+
+        // ===== 贡献榜 =====
+        function renderLeaderboard() {
+            var contribs = state.contributions || {};
+            var entries = [];
+            for (var name in contribs) {
+                if (contribs.hasOwnProperty(name)) entries.push({ name: name, count: contribs[name] });
+            }
+            entries.sort(function(a,b) { return b.count - a.count; });
+
+            var lbDiv = document.getElementById('leaderboard');
+            if (entries.length === 0) { lbDiv.style.display = 'none'; return; }
+            lbDiv.style.display = 'block';
+
+            var html = '';
+            var medals = ['🥇','🥈','🥉'];
+            entries.slice(0, 8).forEach(function(e, i) {
+                html += '<span class="lb-row">' + (medals[i]||'') + ' ' + escapeHtml(e.name) +
+                    ' <span class="lb-count">' + e.count + '次</span></span>';
+            });
+            document.getElementById('lbContent').innerHTML = html;
+        }
+
+        function escapeHtml(text) {
+            var div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
 
         // 绑定按钮
-        document.getElementById('btnWater').addEventListener('click', doWater);
-        document.getElementById('btnSun').addEventListener('click', doSun);
-        document.getElementById('btnFert').addEventListener('click', doFert);
+        document.getElementById('btnWater').addEventListener('click', function() { doAction('water'); });
+        document.getElementById('btnSun').addEventListener('click', function() { doAction('sun'); });
+        document.getElementById('btnFert').addEventListener('click', function() { doAction('fertilize'); });
 
-        // 每分钟检查一次衰减和冷却
-        setInterval(function() {
-            tickDecay();
-            updateCooldowns();
-        }, 60000);
+        // 初始化
+        fetchState();
+
+        // 每30秒刷新
+        setInterval(fetchState, 30000);
     })();
     </script>
 
