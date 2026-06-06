@@ -302,6 +302,39 @@
             font-size: 14px;
         }
 
+        .admin-toggle {
+            text-align: right;
+            margin-bottom: 8px;
+        }
+
+        .admin-toggle a {
+            color: #bbb;
+            font-size: 13px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .admin-toggle a:hover {
+            color: #999;
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: #e74c3c;
+            cursor: pointer;
+            font-size: 13px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        .delete-btn:hover {
+            opacity: 1;
+            background: #fdeaea;
+        }
+
         /* ===== 联系区域 ===== */
         #contact {
             background: #2d2d2d;
@@ -458,6 +491,7 @@
             </form>
 
             <!-- 留言列表 -->
+            <div class="admin-toggle"><a id="adminToggle">🔧 管理</a></div>
             <div class="comment-list" id="commentList">
                 <p class="comment-empty">加载中...</p>
             </div>
@@ -499,57 +533,103 @@
         var form = document.getElementById('commentForm');
         var list = document.getElementById('commentList');
         var submitBtn = document.getElementById('submitBtn');
+        var adminToggle = document.getElementById('adminToggle');
+        var isAdmin = false;
+        var commentsData = [];
 
-        // 从 GitHub comment body 解析出昵称、时间、内容
-        // body 格式: {"name":"xxx","message":"xxx","time":"xxx"}
         function parseComment(body) {
-            try {
-                return JSON.parse(body);
-            } catch(e) {
-                return { name: '匿名', message: body, time: '' };
-            }
+            try { return JSON.parse(body); }
+            catch(e) { return { name: '匿名', message: body, time: '' }; }
         }
 
-        // 格式化时间
         function formatTime(dateStr) {
             var d = new Date(dateStr);
             if (isNaN(d.getTime())) return dateStr;
-            return d.getFullYear() + '-' +
-                pad(d.getMonth() + 1) + '-' +
-                pad(d.getDate()) + ' ' +
-                pad(d.getHours()) + ':' +
-                pad(d.getMinutes());
+            return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
         }
 
-        // 加载留言
+        function renderComments() {
+            if (commentsData.length === 0) {
+                list.innerHTML = '<p class="comment-empty">✨ 还没有留言，来做第一个留言的人吧！</p>';
+                return;
+            }
+            var html = '';
+            commentsData.forEach(function(c) {
+                var p = parseComment(c.body);
+                var delBtn = isAdmin ? '<button class="delete-btn" data-id="' + c.id + '">🗑 删除</button>' : '';
+                html += '<div class="comment-card">' +
+                    '<div class="comment-header">' +
+                        '<span class="comment-name">' + escapeHtml(p.name) + '</span>' +
+                        '<span class="comment-time">' + escapeHtml(formatTime(c.created_at)) + '</span>' +
+                    '</div>' +
+                    '<div class="comment-text">' + escapeHtml(p.message) + '</div>' +
+                    delBtn +
+                '</div>';
+            });
+            list.innerHTML = html;
+
+            // 绑定删除按钮
+            if (isAdmin) {
+                var btns = list.querySelectorAll('.delete-btn');
+                btns.forEach(function(btn) {
+                    btn.addEventListener('click', function() {
+                        deleteComment(parseInt(this.getAttribute('data-id')));
+                    });
+                });
+            }
+        }
+
         function loadComments() {
             fetch(API_URL, { headers: { 'Accept': 'application/vnd.github+json' } })
                 .then(function(r) { return r.json(); })
                 .then(function(comments) {
-                    if (!Array.isArray(comments)) {
-                        throw new Error('Invalid response');
-                    }
-                    if (comments.length === 0) {
-                        list.innerHTML = '<p class="comment-empty">✨ 还没有留言，来做第一个留言的人吧！</p>';
-                    } else {
-                        var html = '';
-                        comments.forEach(function(c) {
-                            var p = parseComment(c.body);
-                            html += '<div class="comment-card">' +
-                                '<div class="comment-header">' +
-                                    '<span class="comment-name">' + escapeHtml(p.name) + '</span>' +
-                                    '<span class="comment-time">' + escapeHtml(formatTime(c.created_at)) + '</span>' +
-                                '</div>' +
-                                '<div class="comment-text">' + escapeHtml(p.message) + '</div>' +
-                            '</div>';
-                        });
-                        list.innerHTML = html;
-                    }
+                    if (!Array.isArray(comments)) throw new Error('Invalid');
+                    commentsData = comments;
+                    renderComments();
                 })
                 .catch(function() {
                     list.innerHTML = '<p class="comment-error">加载留言失败，请刷新重试</p>';
                 });
         }
+
+        function deleteComment(commentId) {
+            if (!confirm('确定要删除这条留言吗？')) return;
+            var pass = prompt('请输入管理密码：');
+            if (!pass) return;
+
+            fetch(POST_URL, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ commentId: commentId, adminPass: pass })
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.ok) {
+                    loadComments();
+                } else {
+                    alert(data.error || '删除失败');
+                }
+            })
+            .catch(function() {
+                alert('删除失败，请重试');
+            });
+        }
+
+        // 管理员切换
+        adminToggle.addEventListener('click', function() {
+            if (isAdmin) {
+                isAdmin = false;
+                adminToggle.textContent = '🔧 管理';
+                renderComments();
+            } else {
+                var pass = prompt('请输入管理密码：');
+                if (pass && pass.length > 0) {
+                    isAdmin = true;
+                    adminToggle.textContent = '🔧 退出管理';
+                    renderComments();
+                }
+            }
+        });
 
         // 提交留言
         form.addEventListener('submit', function(e) {
@@ -561,20 +641,10 @@
             submitBtn.disabled = true;
             submitBtn.textContent = '发送中...';
 
-            var now = new Date();
-            var timeStr = now.getFullYear() + '-' +
-                pad(now.getMonth() + 1) + '-' +
-                pad(now.getDate()) + ' ' +
-                pad(now.getHours()) + ':' +
-                pad(now.getMinutes());
-            var body = JSON.stringify({ name: name, message: msg });
-
             fetch(POST_URL, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: body
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: name, message: msg })
             })
             .then(function(r) {
                 if (!r.ok) throw new Error('Failed');
@@ -595,7 +665,6 @@
         });
 
         function pad(n) { return n < 10 ? '0' + n : n; }
-
         function escapeHtml(text) {
             var div = document.createElement('div');
             div.textContent = text;
